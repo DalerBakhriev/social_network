@@ -7,12 +7,15 @@ import (
 	"net/http"
 	"strconv"
 
+	"io/ioutil"
+
 	"github.com/DalerBakhriev/social_network/internal/app/model"
 	"github.com/gorilla/mux"
 )
 
 const (
 	numUsersOnOnePage = 20
+	loginFormFilePath = "./templates/login.html"
 )
 
 func (s *server) handleSignUp() http.HandlerFunc {
@@ -20,7 +23,12 @@ func (s *server) handleSignUp() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		if r.Method != http.MethodPost {
-			w.Write(loginFormTempl)
+			loginForm, err := ioutil.ReadFile(loginFormFilePath)
+			if err != nil {
+				s.respond(w, r, http.StatusInternalServerError, err)
+				return
+			}
+			w.Write(loginForm)
 			return
 		}
 
@@ -62,8 +70,12 @@ func (s *server) handleLogIn() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		if r.Method != http.MethodPost {
-			w.Write(loginFormTempl)
-			return
+			loginForm, err := ioutil.ReadFile(loginFormFilePath)
+			if err != nil {
+				s.respond(w, r, http.StatusInternalServerError, err)
+				return
+			}
+			w.Write(loginForm)
 		}
 
 		inputEmail := r.FormValue("email")
