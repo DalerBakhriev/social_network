@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
-	"net/http"
-	"strconv"
-
 	"io/ioutil"
+	"net/http"
+	"path"
+	"strconv"
 
 	"github.com/DalerBakhriev/social_network/internal/app/model"
 	"github.com/gorilla/mux"
@@ -15,7 +15,7 @@ import (
 
 const (
 	numUsersOnOnePage = 20
-	loginFormFilePath = "./templates/login.html"
+	templatesPath     = "./internal/app/apiserver/templates"
 )
 
 func (s *server) handleSignUp() http.HandlerFunc {
@@ -23,7 +23,7 @@ func (s *server) handleSignUp() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		if r.Method != http.MethodPost {
-			loginForm, err := ioutil.ReadFile(loginFormFilePath)
+			loginForm, err := ioutil.ReadFile(path.Join(templatesPath, "login.html"))
 			if err != nil {
 				s.respond(w, r, http.StatusInternalServerError, err)
 				return
@@ -59,7 +59,7 @@ func (s *server) handleMainPage() http.HandlerFunc {
 			s.respond(w, r, http.StatusInternalServerError, err)
 			return
 		}
-		tmpl := template.Must(template.ParseFiles("./templates/users.html"))
+		tmpl := template.Must(template.ParseFiles(path.Join(templatesPath, "users.html")))
 		tmpl.Execute(w, users)
 	}
 
@@ -70,7 +70,7 @@ func (s *server) handleLogIn() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		if r.Method != http.MethodPost {
-			loginForm, err := ioutil.ReadFile(loginFormFilePath)
+			loginForm, err := ioutil.ReadFile(path.Join(templatesPath, "login.html"))
 			if err != nil {
 				s.respond(w, r, http.StatusInternalServerError, err)
 				return
@@ -106,7 +106,7 @@ func (s *server) handleLogIn() http.HandlerFunc {
 
 func (s *server) handleGetSingleUser() http.HandlerFunc {
 
-	tmpl := template.Must(template.ParseFiles("./templates/user.html"))
+	tmpl := template.Must(template.ParseFiles(path.Join(templatesPath, "user.html")))
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		vars := mux.Vars(r)
@@ -124,7 +124,7 @@ func (s *server) handleGetSingleUser() http.HandlerFunc {
 
 func (s *server) handleGetFriendsList() http.HandlerFunc {
 
-	tmpl := template.Must(template.ParseFiles("./templates/user.html"))
+	tmpl := template.Must(template.ParseFiles(path.Join(templatesPath, "user.html")))
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		vars := mux.Vars(r)

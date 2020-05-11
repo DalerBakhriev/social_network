@@ -21,7 +21,7 @@ func (r *UserRepository) Create(u *model.User) error {
 
 	return r.store.db.QueryRow(
 		`INSERT INTO users (email, name, surname, age, sex, interests, city, encrypted_password)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 		 RETURNING id`,
 		u.Email,
 		u.Name,
@@ -49,7 +49,7 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 				city,
 				encrypted_password
 		 FROM users
-		 WHERE email = $1`,
+		 WHERE email = ?`,
 		email,
 	).Scan(
 		&u.ID,
@@ -87,7 +87,7 @@ func (r *UserRepository) Find(id int) (*model.User, error) {
 				city,
 				encrypted_password
 		 FROM users
-		 WHERE id = $1`,
+		 WHERE id = ?`,
 		id,
 	).Scan(
 		&u.ID,
@@ -119,15 +119,15 @@ func (r *UserRepository) Update(u *model.User) error {
 
 	return r.store.db.QueryRow(
 		`UPDATE users
-		 SET email = $1,
-			 name = $2,
-			 surname = $3,
-			 age = $4,
-			 sex = $5,
-			 interests = $6,
-			 city = $7,
-			 encrypted_password = $8
-		 WHERE id = $9
+		 SET email = ?,
+			 name = ?,
+			 surname = ?,
+			 age = ?,
+			 sex = ?,
+			 interests = ?,
+			 city = ?,
+			 encrypted_password = ?
+		 WHERE id = ?
 		 RETURNING id`,
 		u.Email,
 		u.Name,
@@ -151,7 +151,7 @@ func (r *UserRepository) GetTopUsers(n int) ([]*model.User, error) {
 				city
 		 FROM users
 		 ORDER BY name
-		 limit $1`,
+		 limit ?`,
 		n,
 	)
 
@@ -183,7 +183,7 @@ func (r *UserRepository) GetFriendsList(id int) ([]*model.User, error) {
 		 FROM users
 		 WHERE id IN (SELECT friend_id
 					  FROM friends
-					  WHERE user_id = $1
+					  WHERE user_id = ?
 					    AND is_accepted = true)`,
 		id,
 	)
@@ -210,7 +210,7 @@ func (r *UserRepository) SendFriendRequest(fromID, toID int) error {
 
 	_, err := r.store.db.Query(
 		`INSERT INTO friends (user_id, friend_id, is_accepted)
-		 VALUES ($1, $2, $3), ($4, $5, $6)`,
+		 VALUES (?, ?, ?), (?, ?, ?)`,
 		fromID, toID, false,
 		toID, fromID, false,
 	)
@@ -224,7 +224,7 @@ func (r *UserRepository) AcceptFriendRequest(fromID, toID int) error {
 	_, err := r.store.db.Query(
 		`UPDATE friends
 		 SET is_accepted = true
-		 WHERE user_id IN ($1, $2) AND friend_id IN ($3, $4)`,
+		 WHERE user_id IN (?, ?) AND friend_id IN (?, ?)`,
 		fromID, toID, toID, fromID,
 	)
 

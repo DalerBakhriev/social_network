@@ -1,4 +1,3 @@
 bind_addr = ":8080"
 log_level = "debug"
-database_url = "postgresql://postgres:Daler1995@localhost:5432/restapi_dev"
 session_key = "some_difficult_key"

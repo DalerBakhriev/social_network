@@ -1,0 +1,43 @@
+version: '3.3'
+
+services:
+
+  db:
+    image: mysql:8.0
+    restart: always
+    build:
+        context: db_init
+        dockerfile: Dockerfile
+    env_file:
+        - .env
+    container_name: db
+    ports:
+      # <Port exposed> : < MySQL Port running inside container>
+      - '3306:3306'
+    expose:
+      # Opens port 3306 on the container
+      - '3306'
+      # Where our data will be persisted
+    volumes:
+      - my-db:/var/lib/mysql
+
+  web:
+    build:
+        context: .
+        dockerfile: Dockerfile
+    env_file:
+        - .env
+    container_name:
+        social_network
+    ports:
+        - 8080:8080
+    tty: true
+    depends_on:
+        - db
+    restart: always
+    links:
+        - db
+    
+# Names our volume
+volumes:
+  my-db:
