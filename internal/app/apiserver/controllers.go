@@ -76,6 +76,7 @@ func (s *server) handleLogIn() http.HandlerFunc {
 				return
 			}
 			w.Write(loginForm)
+			return
 		}
 
 		inputEmail := r.FormValue("email")
