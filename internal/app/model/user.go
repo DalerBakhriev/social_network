@@ -16,6 +16,11 @@ type User struct {
 	EncryptedPassword string `json:""`
 }
 
+// Users ...
+type Users struct {
+	Users []*User
+}
+
 // BeforeCreate ...
 func (u *User) BeforeCreate() error {
 

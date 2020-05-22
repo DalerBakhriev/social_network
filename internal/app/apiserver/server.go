@@ -71,6 +71,7 @@ func (s *server) configureRouter() {
 	s.router.Use(handlers.CORS(handlers.AllowedOrigins([]string{"*"})))
 	s.router.HandleFunc("/signup", s.handleSignUp()).Methods("GET", "POST")
 	s.router.HandleFunc("/login", s.handleLogIn()).Methods("GET", "POST")
+	s.router.HandleFunc("/user_edit", s.handleUserEdit()).Methods("GET", "POST")
 	s.router.HandleFunc("/", s.handleMainPage()).Methods("GET")
 	s.router.HandleFunc("/users/{user_id:[0-9]+}", s.handleGetSingleUser()).Methods("GET")
 	s.router.HandleFunc("/users/{user_id:[0-9]+}/friend_request", s.handleSendFriendsRequest()).Methods("POST")

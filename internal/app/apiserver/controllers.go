@@ -23,7 +23,7 @@ func (s *server) handleSignUp() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		if r.Method != http.MethodPost {
-			loginForm, err := ioutil.ReadFile(path.Join(templatesPath, "login.html"))
+			loginForm, err := ioutil.ReadFile(path.Join(templatesPath, "signup.html"))
 			if err != nil {
 				s.respond(w, r, http.StatusInternalServerError, err)
 				return
@@ -46,7 +46,7 @@ func (s *server) handleSignUp() http.HandlerFunc {
 		}
 
 		user.Sanitize()
-		s.respond(w, r, http.StatusCreated, user)
+		http.Redirect(w, r, "/login", http.StatusCreated)
 	}
 }
 
@@ -59,8 +59,10 @@ func (s *server) handleMainPage() http.HandlerFunc {
 			s.respond(w, r, http.StatusInternalServerError, err)
 			return
 		}
+
+		usersForTemplate := model.Users{Users: users}
 		tmpl := template.Must(template.ParseFiles(path.Join(templatesPath, "users.html")))
-		tmpl.Execute(w, users)
+		tmpl.Execute(w, usersForTemplate)
 	}
 
 }
@@ -101,6 +103,59 @@ func (s *server) handleLogIn() http.HandlerFunc {
 
 		session.Values["user_id"] = user.ID
 
+		http.Redirect(w, r, "/user_edit", http.StatusPermanentRedirect)
+	}
+}
+
+func (s *server) handleUserEdit() http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		if r.Method != http.MethodPost {
+
+			userEditForm, err := ioutil.ReadFile(path.Join(templatesPath, "user_edit.html"))
+			if err != nil {
+				s.respond(w, r, http.StatusInternalServerError, err)
+				return
+			}
+			w.Write(userEditForm)
+			return
+		}
+
+		userID, err := s.getUserID(w, r)
+		if err != nil {
+			s.respond(w, r, http.StatusUnauthorized, err)
+			return
+		}
+
+		inputName := r.FormValue("name")
+		inputSurname := r.FormValue("surname")
+		inputCity := r.FormValue("city")
+		inputAge := r.FormValue("age")
+		inputSex := r.FormValue("sex")
+		inputInterests := r.FormValue("interests")
+
+		age, err := strconv.Atoi(inputAge)
+		if err != nil {
+			s.respond(w, r, http.StatusBadRequest, errors.New("wrong age format, must be number"))
+			return
+		}
+
+		user := &model.User{
+			ID:        userID,
+			Name:      inputName,
+			Surname:   inputSurname,
+			City:      inputCity,
+			Age:       age,
+			Sex:       inputSex,
+			Interests: inputInterests,
+		}
+
+		if err := s.store.User().Update(user); err != nil {
+			s.respond(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
 		http.Redirect(w, r, fmt.Sprintf("/users/%d", user.ID), http.StatusPermanentRedirect)
 	}
 }
@@ -118,6 +173,7 @@ func (s *server) handleGetSingleUser() http.HandlerFunc {
 			return
 		}
 		user, err := s.store.User().Find(id)
+		s.logger.Infof("Got user %v", user)
 		tmpl.Execute(w, user)
 	}
 
@@ -137,7 +193,9 @@ func (s *server) handleGetFriendsList() http.HandlerFunc {
 			return
 		}
 		users, err := s.store.User().GetFriendsList(id)
-		tmpl.Execute(w, users)
+
+		usersForTemplate := model.Users{Users: users}
+		tmpl.Execute(w, usersForTemplate)
 	}
 }
 

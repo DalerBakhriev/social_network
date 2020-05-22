@@ -19,10 +19,9 @@ func (r *UserRepository) Create(u *model.User) error {
 		return err
 	}
 
-	return r.store.db.QueryRow(
+	_, err := r.store.db.Query(
 		`INSERT INTO users (email, name, surname, age, sex, interests, city, encrypted_password)
-		 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-		 RETURNING id`,
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
 		u.Email,
 		u.Name,
 		u.Surname,
@@ -31,7 +30,9 @@ func (r *UserRepository) Create(u *model.User) error {
 		u.Interests,
 		u.City,
 		u.EncryptedPassword,
-	).Scan(&u.ID)
+	)
+
+	return err
 }
 
 // FindByEmail ...
@@ -117,28 +118,25 @@ func (r *UserRepository) Update(u *model.User) error {
 		return err
 	}
 
-	return r.store.db.QueryRow(
+	_, err := r.store.db.Query(
 		`UPDATE users
-		 SET email = ?,
-			 name = ?,
+		 SET name = ?,
 			 surname = ?,
 			 age = ?,
 			 sex = ?,
 			 interests = ?,
-			 city = ?,
-			 encrypted_password = ?
-		 WHERE id = ?
-		 RETURNING id`,
-		u.Email,
+			 city = ?
+		 WHERE id = ?`,
 		u.Name,
 		u.Surname,
 		u.Age,
 		u.Sex,
 		u.Interests,
 		u.City,
-		u.EncryptedPassword,
 		u.ID,
-	).Scan(&u.ID)
+	)
+
+	return err
 }
 
 // GetTopUsers ...
@@ -162,10 +160,17 @@ func (r *UserRepository) GetTopUsers(n int) ([]*model.User, error) {
 
 	users := make([]*model.User, 0)
 	for rows.Next() {
+
 		user := &model.User{}
-		if err := rows.Scan(&user.Name, &user.Surname, &user.Age, &user.City); err != nil {
+		if err := rows.Scan(
+			&user.Name,
+			&user.Surname,
+			&user.Age,
+			&user.City,
+		); err != nil {
 			return nil, err
 		}
+
 		users = append(users, user)
 	}
 
