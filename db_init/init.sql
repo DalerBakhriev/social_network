@@ -1,11 +1,11 @@
 CREATE TABLE IF NOT EXISTS users (
       id INT NOT NULL AUTO_INCREMENT,
-      email VARCHAR(100) NOT NULL,
+      email VARCHAR(100) NOT NULL UNIQUE,
       name VARCHAR(100),
       surname VARCHAR(100),
       age INT NOT NULL,
       sex VARCHAR(100),
-      interests VARCHAR(100),
+      interests MEDIUMTEXT,
       city VARCHAR(100),
       encrypted_password VARCHAR(100) NOT NULL,
       PRIMARY KEY (id, email)

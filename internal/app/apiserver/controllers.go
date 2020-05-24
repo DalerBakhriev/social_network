@@ -25,7 +25,7 @@ func (s *server) handleSignUp() http.HandlerFunc {
 		if r.Method != http.MethodPost {
 			loginForm, err := ioutil.ReadFile(path.Join(templatesPath, "signup.html"))
 			if err != nil {
-				s.respond(w, r, http.StatusInternalServerError, err)
+				s.error(w, r, http.StatusInternalServerError, err)
 				return
 			}
 			w.Write(loginForm)
@@ -34,10 +34,28 @@ func (s *server) handleSignUp() http.HandlerFunc {
 
 		inputEmail := r.FormValue("email")
 		inputPassword := r.FormValue("password")
+		inputName := r.FormValue("name")
+		inputSurname := r.FormValue("surname")
+		inputCity := r.FormValue("city")
+		inputAge := r.FormValue("age")
+		inputSex := r.FormValue("sex")
+		inputInterests := r.FormValue("interests")
+
+		age, err := strconv.Atoi(inputAge)
+		if err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
 
 		user := &model.User{
-			Email:    inputEmail,
-			Password: inputPassword,
+			Email:     inputEmail,
+			Password:  inputPassword,
+			Name:      inputName,
+			Surname:   inputSurname,
+			City:      inputCity,
+			Age:       age,
+			Sex:       inputSex,
+			Interests: inputInterests,
 		}
 
 		if err := s.store.User().Create(user); err != nil {
@@ -46,7 +64,7 @@ func (s *server) handleSignUp() http.HandlerFunc {
 		}
 
 		user.Sanitize()
-		http.Redirect(w, r, "/login", http.StatusCreated)
+		http.Redirect(w, r, "/login", http.StatusFound)
 	}
 }
 
@@ -56,7 +74,7 @@ func (s *server) handleMainPage() http.HandlerFunc {
 
 		users, err := s.store.User().GetTopUsers(numUsersOnOnePage)
 		if err != nil {
-			s.respond(w, r, http.StatusInternalServerError, err)
+			s.error(w, r, http.StatusInternalServerError, err)
 			return
 		}
 
@@ -74,7 +92,7 @@ func (s *server) handleLogIn() http.HandlerFunc {
 		if r.Method != http.MethodPost {
 			loginForm, err := ioutil.ReadFile(path.Join(templatesPath, "login.html"))
 			if err != nil {
-				s.respond(w, r, http.StatusInternalServerError, err)
+				s.error(w, r, http.StatusInternalServerError, err)
 				return
 			}
 			w.Write(loginForm)
@@ -95,15 +113,20 @@ func (s *server) handleLogIn() http.HandlerFunc {
 			return
 		}
 
-		session, err := s.sessionStore.New(r, sessionName)
+		session, err := s.sessionStore.Get(r, sessionName)
 		if err != nil {
-			s.error(w, r, http.StatusInternalServerError, errors.New("Failed to create new session"))
+			s.error(w, r, http.StatusInternalServerError, err)
 			return
 		}
 
 		session.Values["user_id"] = user.ID
+		err = session.Save(r, w)
+		if err != nil {
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
 
-		http.Redirect(w, r, "/user_edit", http.StatusPermanentRedirect)
+		http.Redirect(w, r, fmt.Sprintf("/users/%d", user.ID), http.StatusFound)
 	}
 }
 
@@ -124,7 +147,7 @@ func (s *server) handleUserEdit() http.HandlerFunc {
 
 		userID, err := s.getUserID(w, r)
 		if err != nil {
-			s.respond(w, r, http.StatusUnauthorized, err)
+			s.error(w, r, http.StatusUnauthorized, err)
 			return
 		}
 
@@ -137,7 +160,7 @@ func (s *server) handleUserEdit() http.HandlerFunc {
 
 		age, err := strconv.Atoi(inputAge)
 		if err != nil {
-			s.respond(w, r, http.StatusBadRequest, errors.New("wrong age format, must be number"))
+			s.error(w, r, http.StatusBadRequest, errors.New("wrong age format, must be number"))
 			return
 		}
 
@@ -152,11 +175,11 @@ func (s *server) handleUserEdit() http.HandlerFunc {
 		}
 
 		if err := s.store.User().Update(user); err != nil {
-			s.respond(w, r, http.StatusInternalServerError, err)
+			s.error(w, r, http.StatusInternalServerError, err)
 			return
 		}
 
-		http.Redirect(w, r, fmt.Sprintf("/users/%d", user.ID), http.StatusPermanentRedirect)
+		http.Redirect(w, r, fmt.Sprintf("/users/%d", user.ID), http.StatusFound)
 	}
 }
 

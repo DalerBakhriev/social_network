@@ -145,8 +145,10 @@ func (r *UserRepository) GetTopUsers(n int) ([]*model.User, error) {
 	rows, err := r.store.db.Query(
 		`SELECT name,
 				surname,
+				sex,
 				age,
-				city
+				city,
+				interests
 		 FROM users
 		 ORDER BY name
 		 limit ?`,
@@ -165,8 +167,10 @@ func (r *UserRepository) GetTopUsers(n int) ([]*model.User, error) {
 		if err := rows.Scan(
 			&user.Name,
 			&user.Surname,
+			&user.Sex,
 			&user.Age,
 			&user.City,
+			&user.Interests,
 		); err != nil {
 			return nil, err
 		}

@@ -2,8 +2,12 @@
 <body>
 	<h1>Users</h1>
 	{{range .Users}}
-		<b>{{.Email}}</b>
-		<br />
+		<b>{{.Name}} {{.Surname}}</b><Br>
+		Age: {{.Age}}, Sex: {{.Sex}}<Br>
+		City: {{.City}}<Br>
+		Interests: {{.Interests}}
+		<Br>
+		<Br>
 	{{end}}
 </body>
 </html>
