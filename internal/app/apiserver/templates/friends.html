@@ -1,12 +1,14 @@
 <html>
 <body>
-	<h1>Users</h1>
+	<h1>Friends</h1>
 	{{range .Users}}
-	    <a href="/users/{{.ID}}">{{.Name}} {{.Surname}}</a><Br>
+		<a href="/users/{{.ID}}">{{.Name}} {{.Surname}}</a><Br>
 		Age: {{.Age}}, Sex: {{.Sex}}<Br>
 		City: {{.City}}<Br>
 		Interests: {{.Interests}}
 		<Br>
+		<Br>
+		<a href="/users/{{.ID}}/friends">Friends</a>
 	{{end}}
 </body>
 </html>

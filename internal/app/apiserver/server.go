@@ -74,6 +74,7 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("/user_edit", s.handleUserEdit()).Methods("GET", "POST")
 	s.router.HandleFunc("/", s.handleMainPage()).Methods("GET")
 	s.router.HandleFunc("/users/{user_id:[0-9]+}", s.handleGetSingleUser()).Methods("GET")
+	s.router.HandleFunc("/users/{user_id:[0-9]+}/friends", s.handleGetFriendsList()).Methods("GET")
 	s.router.HandleFunc("/users/{user_id:[0-9]+}/friend_request", s.handleSendFriendsRequest()).Methods("POST")
 	s.router.HandleFunc("users/{user_id:[0-9]+}/accept_friend_request", s.handleAcceptFriendsRequest()).Methods("POST")
 

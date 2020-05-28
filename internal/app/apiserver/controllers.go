@@ -204,7 +204,7 @@ func (s *server) handleGetSingleUser() http.HandlerFunc {
 
 func (s *server) handleGetFriendsList() http.HandlerFunc {
 
-	tmpl := template.Must(template.ParseFiles(path.Join(templatesPath, "user.html")))
+	tmpl := template.Must(template.ParseFiles(path.Join(templatesPath, "friends.html")))
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		vars := mux.Vars(r)
