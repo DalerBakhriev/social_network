@@ -19,7 +19,7 @@ func (r *UserRepository) Create(u *model.User) error {
 		return err
 	}
 
-	_, err := r.store.db.Query(
+	_, err := r.store.db.Exec(
 		`INSERT INTO users (email, name, surname, age, sex, interests, city, encrypted_password)
 		 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
 		u.Email,
@@ -118,7 +118,7 @@ func (r *UserRepository) Update(u *model.User) error {
 		return err
 	}
 
-	_, err := r.store.db.Query(
+	_, err := r.store.db.Exec(
 		`UPDATE users
 		 SET name = ?,
 			 surname = ?,
@@ -217,7 +217,7 @@ func (r *UserRepository) GetFriendsList(id int) ([]*model.User, error) {
 // SendFriendRequest ...
 func (r *UserRepository) SendFriendRequest(fromID, toID int) error {
 
-	_, err := r.store.db.Query(
+	_, err := r.store.db.Exec(
 		`INSERT INTO friends (user_id, friend_id, is_accepted)
 		 VALUES (?, ?, ?), (?, ?, ?)`,
 		fromID, toID, false,
@@ -230,7 +230,7 @@ func (r *UserRepository) SendFriendRequest(fromID, toID int) error {
 // AcceptFriendRequest ...
 func (r *UserRepository) AcceptFriendRequest(fromID, toID int) error {
 
-	_, err := r.store.db.Query(
+	_, err := r.store.db.Exec(
 		`UPDATE friends
 		 SET is_accepted = true
 		 WHERE user_id IN (?, ?) AND friend_id IN (?, ?)`,
