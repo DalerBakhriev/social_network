@@ -5,6 +5,3 @@ up:
 .PHONY: down
 down:
 		docker-compose down
-
-
-
