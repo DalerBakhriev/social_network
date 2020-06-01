@@ -21,6 +21,18 @@ type Users struct {
 	Users []*User
 }
 
+// FriendsAndRequests ...
+type FriendsAndRequests struct {
+	Users      []*User
+	CurrUserID int
+}
+
+// UserAndFriendRequest ...
+type UserAndFriendRequest struct {
+	User
+	CurrUserID int
+}
+
 // BeforeCreate ...
 func (u *User) BeforeCreate() error {
 

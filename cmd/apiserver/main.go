@@ -8,17 +8,12 @@ import (
 	"github.com/DalerBakhriev/social_network/internal/app/apiserver"
 )
 
-var (
-	configPath string
-)
-
-func init() {
-	flag.StringVar(&configPath, "config-path", "./configs/apiserver.toml", "path to config file")
-}
-
 func main() {
 
+	var configPath string
+	flag.StringVar(&configPath, "config-path", "./configs/apiserver.toml", "path to config file")
 	flag.Parse()
+
 	config := apiserver.NewConfig()
 
 	_, err := toml.DecodeFile(configPath, config)

@@ -202,6 +202,29 @@ func (s *server) handleGetSingleUser() http.HandlerFunc {
 
 }
 
+func (s *server) handleGetFriendsRequests() http.HandlerFunc {
+
+	tmpl := template.Must(template.ParseFiles(path.Join(templatesPath, "requests.html")))
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		vars := mux.Vars(r)
+		userID := vars["user_id"]
+
+		id, err := strconv.Atoi(userID)
+		if err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+		users, err := s.store.User().GetFriendsList(id)
+
+		usersForTemplate := model.FriendsAndRequests{
+			Users:      users,
+			CurrUserID: id,
+		}
+		tmpl.Execute(w, usersForTemplate)
+	}
+}
+
 func (s *server) handleGetFriendsList() http.HandlerFunc {
 
 	tmpl := template.Must(template.ParseFiles(path.Join(templatesPath, "friends.html")))
@@ -217,7 +240,10 @@ func (s *server) handleGetFriendsList() http.HandlerFunc {
 		}
 		users, err := s.store.User().GetFriendsList(id)
 
-		usersForTemplate := model.Users{Users: users}
+		usersForTemplate := model.FriendsAndRequests{
+			Users:      users,
+			CurrUserID: id,
+		}
 		tmpl.Execute(w, usersForTemplate)
 	}
 }
@@ -240,10 +266,8 @@ func (s *server) getUserID(w http.ResponseWriter, r *http.Request) (int, error) 
 
 func (s *server) getFriendID(w http.ResponseWriter, r *http.Request) (int, error) {
 
-	friendID := r.FormValue("friend_id")
-	if friendID == "" {
-		return -1, errors.New("Could not find friend id")
-	}
+	vars := mux.Vars(r)
+	friendID := vars["friend_id"]
 
 	idTo, err := strconv.Atoi(friendID)
 	if err != nil {
@@ -285,6 +309,18 @@ func (s *server) handleAcceptFriendsRequest() http.HandlerFunc {
 		userID, err := s.getUserID(w, r)
 		if err != nil {
 			s.error(w, r, http.StatusUnauthorized, err)
+			return
+		}
+
+		vars := mux.Vars(r)
+		userIDFromRequest, err := strconv.Atoi(vars["user_id"])
+		if err != nil {
+			s.error(w, r, http.StatusBadRequest, err)
+			return
+		}
+
+		if userID != userIDFromRequest {
+			s.error(w, r, http.StatusUnauthorized, errors.New("To accept this request login as current user"))
 			return
 		}
 

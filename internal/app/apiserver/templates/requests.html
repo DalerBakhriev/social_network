@@ -1,13 +1,13 @@
 <html>
 <body>
-	<h1>Friends</h1>
+	<h1>Requests</h1>
 	{{range .Users}}
 		<a href="/users/{{.ID}}">{{.Name}} {{.Surname}}</a><Br>
 		Age: {{.Age}}, Sex: {{.Sex}}<Br>
 		City: {{.City}}<Br>
 		Interests: {{.Interests}}
 		<Br>
+		<a href="/users/{{.CurrUserID}}/accept_friends_request/{{.ID}}">Accept friend request</a>
 	{{end}}
-	<a href="/users/{{.CurrUserID}}/friends_requests">Friends requests</a>
 </body>
 </html>

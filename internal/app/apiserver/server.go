@@ -75,8 +75,9 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("/", s.handleMainPage()).Methods("GET")
 	s.router.HandleFunc("/users/{user_id:[0-9]+}", s.handleGetSingleUser()).Methods("GET")
 	s.router.HandleFunc("/users/{user_id:[0-9]+}/friends", s.handleGetFriendsList()).Methods("GET")
-	s.router.HandleFunc("/users/{user_id:[0-9]+}/friend_request", s.handleSendFriendsRequest()).Methods("POST")
-	s.router.HandleFunc("users/{user_id:[0-9]+}/accept_friend_request", s.handleAcceptFriendsRequest()).Methods("POST")
+	s.router.HandleFunc("/users/{user_id:[0-9]+}/friends_requests", s.handleGetFriendsRequests()).Methods("GET")
+	s.router.HandleFunc("/users/send_friend_request/{friend_id:[0-9]+}", s.handleSendFriendsRequest()).Methods("GET", "POST")
+	s.router.HandleFunc("/users/{user_id:[0-9]+}/accept_friend_request{friend_id:[0-9]+}", s.handleAcceptFriendsRequest()).Methods("POST")
 
 	private := s.router.PathPrefix("/private").Subrouter()
 	private.Use(s.authenticateUser)

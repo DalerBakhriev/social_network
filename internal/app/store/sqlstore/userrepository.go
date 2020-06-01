@@ -205,7 +205,50 @@ func (r *UserRepository) GetFriendsList(id int) ([]*model.User, error) {
 	users := make([]*model.User, 0)
 	for rows.Next() {
 		user := &model.User{}
-		if err := rows.Scan(&user.Name, &user.Surname, &user.Age, &user.City); err != nil {
+		if err := rows.Scan(
+			&user.Name,
+			&user.Surname,
+			&user.Age,
+			&user.City,
+		); err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+
+	return users, nil
+}
+
+// GetFriendsRequests ...
+func (r *UserRepository) GetFriendsRequests(id int) ([]*model.User, error) {
+
+	rows, err := r.store.db.Query(
+		`SELECT name,
+				surname,
+				age,
+				city
+		 FROM users
+		 WHERE id IN (SELECT friend_id
+					  FROM friends
+					  WHERE user_id = ?
+					    AND is_accepted = false)`,
+		id,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	users := make([]*model.User, 0)
+	for rows.Next() {
+		user := &model.User{}
+		if err := rows.Scan(
+			&user.Name,
+			&user.Surname,
+			&user.Age,
+			&user.City,
+		); err != nil {
 			return nil, err
 		}
 		users = append(users, user)
