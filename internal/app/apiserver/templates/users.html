@@ -1,12 +1,46 @@
+<!DOCTYPE html>
 <html>
+<head>
+  <meta charset="utf-8">
+    <style>
+        ul.hr {
+            margin: 0; /* Обнуляем значение отступов */
+            padding: 4px; /* Значение полей */
+        }
+        ul.hr li, h1, form {
+            display: inline; /* Отображать как строчный элемент */
+            margin-right: 90px; /* Отступ слева */
+            padding: 50px; /* Поля вокруг текста */
+        }
+
+    </style>
+</head>
 <body>
-	<h1>Users</h1>
+<ul class="hr">
+    <li><h1>
+            Social network
+        </h1>
+    </li>
+    
+    <li>
+        <a href="/login">Log in</a>
+        <a href="/signup">Sign up</a>
+        <a href="/logout">Log out</a>
+    </li>
+</ul>
+<hr size="5">
+
+<h1>Users</h1>
+	<Br>
+	<Br>
 	{{range .Users}}
 	    <a href="/users/{{.ID}}">{{.Name}} {{.Surname}}</a><Br>
 		Age: {{.Age}}, Sex: {{.Sex}}<Br>
 		City: {{.City}}<Br>
 		Interests: {{.Interests}}
 		<Br>
+		<Br>
 	{{end}}
+
 </body>
 </html>

@@ -10,6 +10,7 @@ type UserRepository interface {
 	Update(*model.User) error
 	GetTopUsers(int) ([]*model.User, error)
 	GetFriendsList(int) ([]*model.User, error)
+	GetFriendsRequests(int) ([]*model.User, error)
 	SendFriendRequest(int, int) error
 	AcceptFriendRequest(int, int) error
 }

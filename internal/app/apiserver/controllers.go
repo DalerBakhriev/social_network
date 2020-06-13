@@ -130,6 +130,29 @@ func (s *server) handleLogIn() http.HandlerFunc {
 	}
 }
 
+func (s *server) handleLogOut() http.HandlerFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		session, err := s.sessionStore.Get(r, sessionName)
+		if err != nil {
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		session.Values["user_id"] = -1
+		session.Options.MaxAge = -1
+
+		err = session.Save(r, w)
+		if err != nil {
+			s.error(w, r, http.StatusInternalServerError, err)
+			return
+		}
+
+		http.Redirect(w, r, "/", http.StatusOK)
+	}
+}
+
 func (s *server) handleUserEdit() http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -196,7 +219,6 @@ func (s *server) handleGetSingleUser() http.HandlerFunc {
 			return
 		}
 		user, err := s.store.User().Find(id)
-		s.logger.Infof("Got user %v", user)
 		tmpl.Execute(w, user)
 	}
 
@@ -215,7 +237,7 @@ func (s *server) handleGetFriendsRequests() http.HandlerFunc {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
-		users, err := s.store.User().GetFriendsList(id)
+		users, err := s.store.User().GetFriendsRequests(id)
 
 		usersForTemplate := model.FriendsAndRequests{
 			Users:      users,
@@ -299,6 +321,7 @@ func (s *server) handleSendFriendsRequest() http.HandlerFunc {
 			return
 		}
 
+		http.Redirect(w, r, fmt.Sprintf("/users/%d", friendID), http.StatusFound)
 	}
 }
 

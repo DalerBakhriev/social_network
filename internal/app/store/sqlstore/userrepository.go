@@ -143,7 +143,8 @@ func (r *UserRepository) Update(u *model.User) error {
 func (r *UserRepository) GetTopUsers(n int) ([]*model.User, error) {
 
 	rows, err := r.store.db.Query(
-		`SELECT name,
+		`SELECT id,
+		        name,
 				surname,
 				sex,
 				age,
@@ -165,6 +166,7 @@ func (r *UserRepository) GetTopUsers(n int) ([]*model.User, error) {
 
 		user := &model.User{}
 		if err := rows.Scan(
+			&user.ID,
 			&user.Name,
 			&user.Surname,
 			&user.Sex,
@@ -185,10 +187,13 @@ func (r *UserRepository) GetTopUsers(n int) ([]*model.User, error) {
 func (r *UserRepository) GetFriendsList(id int) ([]*model.User, error) {
 
 	rows, err := r.store.db.Query(
-		`SELECT name,
+		`SELECT id,
+		        name,
 				surname,
 				age,
-				city
+				sex,
+				city,
+				interests
 		 FROM users
 		 WHERE id IN (SELECT friend_id
 					  FROM friends
@@ -206,10 +211,13 @@ func (r *UserRepository) GetFriendsList(id int) ([]*model.User, error) {
 	for rows.Next() {
 		user := &model.User{}
 		if err := rows.Scan(
+			&user.ID,
 			&user.Name,
 			&user.Surname,
 			&user.Age,
+			&user.Sex,
 			&user.City,
+			&user.Interests,
 		); err != nil {
 			return nil, err
 		}
@@ -223,10 +231,13 @@ func (r *UserRepository) GetFriendsList(id int) ([]*model.User, error) {
 func (r *UserRepository) GetFriendsRequests(id int) ([]*model.User, error) {
 
 	rows, err := r.store.db.Query(
-		`SELECT name,
+		`SELECT id,
+		        name,
 				surname,
 				age,
-				city
+				sex,
+				city,
+				interests
 		 FROM users
 		 WHERE id IN (SELECT friend_id
 					  FROM friends
@@ -244,10 +255,13 @@ func (r *UserRepository) GetFriendsRequests(id int) ([]*model.User, error) {
 	for rows.Next() {
 		user := &model.User{}
 		if err := rows.Scan(
+			&user.ID,
 			&user.Name,
 			&user.Surname,
 			&user.Age,
+			&user.Sex,
 			&user.City,
+			&user.Interests,
 		); err != nil {
 			return nil, err
 		}

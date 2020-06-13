@@ -1,13 +1,44 @@
 <html>
+<head>
+	<meta charset="utf-8">
+		<style>
+			ul.hr {
+				margin: 0; /* Обнуляем значение отступов */
+				padding: 4px; /* Значение полей */
+			}
+			ul.hr li, h1, form {
+				display: inline; /* Отображать как строчный элемент */
+				margin-right: 90px; /* Отступ слева */
+				padding: 50px; /* Поля вокруг текста */
+			}
+	
+		</style>
+	</head>
 <body>
+	<ul class="hr">
+		<li><h1>
+				Social network
+			</h1>
+		</li>
+		
+		<li>
+			<a href="/login">Log in</a>
+			<a href="/signup">Sign up</a>
+			<a href="/logout">Log out</a>
+		</li>
+	</ul>
+	<hr size="5">
+
 	<h1>Requests</h1>
+	<Br>
+	<Br>
+	{{$currUserID := .CurrUserID}}
 	{{range .Users}}
 		<a href="/users/{{.ID}}">{{.Name}} {{.Surname}}</a><Br>
 		Age: {{.Age}}, Sex: {{.Sex}}<Br>
 		City: {{.City}}<Br>
-		Interests: {{.Interests}}
-		<Br>
-		<a href="/users/{{.CurrUserID}}/accept_friends_request/{{.ID}}">Accept friend request</a>
+		Interests: {{.Interests}}<Br>
+		<a href="/users/{{$currUserID}}/accept_friend_request/{{.ID}}">Accept friend request</a>
 	{{end}}
 </body>
 </html>
