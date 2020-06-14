@@ -13,4 +13,5 @@ type UserRepository interface {
 	GetFriendsRequests(int) ([]*model.User, error)
 	SendFriendRequest(int, int) error
 	AcceptFriendRequest(int, int) error
+	RequestWasAlreadySent(int, int) bool
 }

@@ -271,8 +271,31 @@ func (r *UserRepository) GetFriendsRequests(id int) ([]*model.User, error) {
 	return users, nil
 }
 
+// RequestWasAlreadySent ...
+func (r *UserRepository) RequestWasAlreadySent(fromID, toID int) bool {
+
+	var userID, friendID int
+	err := r.store.db.QueryRow(
+		`SELECT user_id, friend_id
+		 FROM friends
+		 WHERE user_id = ? AND friend_id = ?`,
+		fromID,
+		toID,
+	).Scan(&userID, &friendID)
+
+	if err != nil {
+		return false
+	}
+
+	return true
+}
+
 // SendFriendRequest ...
 func (r *UserRepository) SendFriendRequest(fromID, toID int) error {
+
+	if requestwasAlreadySent := r.RequestWasAlreadySent(fromID, toID); requestwasAlreadySent {
+		return store.ErrFriendRequestWasAlreadySent
+	}
 
 	_, err := r.store.db.Exec(
 		`INSERT INTO friends (user_id, friend_id, is_accepted)

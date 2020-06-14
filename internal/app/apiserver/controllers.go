@@ -315,6 +315,11 @@ func (s *server) handleSendFriendsRequest() http.HandlerFunc {
 			return
 		}
 
+		if userID == friendID {
+			s.error(w, r, http.StatusBadRequest, errors.New("You cant send friends request to yourself"))
+			return
+		}
+
 		errFriendRequest := s.store.User().SendFriendRequest(userID, friendID)
 		if errFriendRequest != nil {
 			s.error(w, r, http.StatusInternalServerError, errFriendRequest)
